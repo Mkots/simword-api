@@ -1,37 +1,38 @@
-import Fastify, { FastifyInstance, RouteShorthandOptions } from 'fastify'
-import { Server, IncomingMessage, ServerResponse } from 'http'
+import Fastify, {FastifyInstance, FastifyReply, FastifyRequest} from 'fastify'
+import jwt from '@fastify/jwt'
 import userRoute from "./src/user/user.route";
 
-const server: FastifyInstance = Fastify({})
+import {UserSchemas} from "./src/user/user.schema";
 
-const opts: RouteShorthandOptions = {
-    schema: {
-        response: {
-            200: {
-                type: 'object',
-                properties: {
-                    pong: {
-                        type: 'string'
-                    }
-                }
-            }
-        }
+declare module 'fastify' {
+    export interface FastifyInstance {
+        authenticate: (request: FastifyRequest, reply: FastifyReply) => void
     }
 }
 
-server.get('/ping', opts, async (request, reply) => {
-    return { pong: 'it worked!' }
-})
+export const server: FastifyInstance = Fastify({})
 
 const start = async () => {
+    for (const schema of UserSchemas) {
+        server.addSchema(schema)
+    }
+    server.register(userRoute, {prefix: 'api/user'})
 
-    server.register(userRoute, { prefix: 'api/user' })
+    server.register(jwt, {
+        secret: 'secret',
+    })
+
+    server.decorate('authenticate', async (request: FastifyRequest, reply: FastifyReply) => {
+        try {
+            await request.jwtVerify()
+        } catch (e) {
+            return reply.status(401).send(e)
+        }
+    })
 
     try {
-        await server.listen({ port: 3000 })
+        await server.listen({port: 3000})
 
-        const address = server.server.address()
-        const port = typeof address === 'string' ? address : address?.port
 
     } catch (err) {
         server.log.error(err)
