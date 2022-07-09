@@ -1,5 +1,8 @@
 import Fastify, {FastifyInstance, FastifyReply, FastifyRequest} from 'fastify'
 import jwt from '@fastify/jwt'
+import swagger from "@fastify/swagger";
+import { withRefResolver } from "fastify-zod";
+
 import userRoute from "./src/user/user.route";
 
 import {UserSchemas} from "./src/user/user.schema";
@@ -16,6 +19,18 @@ const start = async () => {
     for (const schema of UserSchemas) {
         server.addSchema(schema)
     }
+    server.register(swagger, withRefResolver({
+        routePrefix: '/docs',
+        exposeRoute: true,
+        staticCSP: true,
+        openapi:{
+            info: {
+                title: 'Title',
+                description: 'Description',
+                version: '1.0.0'
+            }
+        }
+    }))
     server.register(userRoute, {prefix: 'api/user'})
 
     server.register(jwt, {
