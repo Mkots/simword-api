@@ -1,16 +1,45 @@
 version: '3.1'
 services :
-  db:
-    image: postgres:10-alpine
+  api:
+    container_name: simword-api
     ports:
-      - "5432:5432"
+      - 5000:5000
+    depends_on:
+      - db
+    build:
+      dockerfile: Dockerfile
+      context: .
+    env_file: .env
+    command:
+      - ./wait-for-it.sh db:5432 -- yarn start
+    volumes:
+      - /app/node_modules
+      - ./:/app
+    networks:
+      - backend
+  db:
+    image: postgres:latest
     environment:
-      POSTGRES_USER: user1
-      POSTGRES_PASSWORD: changeme
-      POSTGRES_DB: simword
+      - POSTGRES_USER=user1
+      - POSTGRES_PASSWORD=changeme
+      - POSTGRES_DB=simword
+    ports:
+      - 5432:5432
+    volumes:
+      - db:/var/lib/postgresql/data
+    networks:
+      - backend
   admin:
     image: adminer
     depends_on:
       - db
     ports:
       - 8080:8080
+    networks:
+      - backend
+networks:
+  backend:
+    driver: bridge
+volumes:
+  db:
+    driver: local

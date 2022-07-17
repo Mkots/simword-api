@@ -1,7 +1,7 @@
 
 import {createUserHandler, getUsersHandler, loginHandler} from "./user.controller";
 import {$ref} from "./user.schema";
-import {server} from "../../app";
+import {server} from "../app";
 import {FastifyInstance} from "fastify";
 
 async function userRoute(fastify: FastifyInstance) {
