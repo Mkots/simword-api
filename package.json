@@ -2,15 +2,18 @@
   "name": "simword-api",
   "version": "1.0.0",
   "description": "This project was bootstrapped with Fastify-CLI.",
-  "main": "app.ts",
+  "main": "src/app.ts",
   "directories": {
     "test": "test"
   },
   "scripts": {
     "test": "tap \"test/**/*.test.js\"",
-    "start": "fastify start -l info app.ts",
-    "dev:fast": "fastify start -w -l info -P app.ts",
-    "dev": "ts-node-dev --respawn --transpile-only --exit-child ./app.ts"
+    "build": "tsc -p tsconfig.json",
+    "start": "node src/app.js",
+    "prisma:generate": "prisma generate",
+    "preview": "fastify start -l info src/app.ts",
+    "dev:fast": "fastify start -w -l info -P src/app.ts",
+    "dev": "ts-node-dev --respawn --transpile-only --exit-child src/app.ts"
   },
   "keywords": [],
   "author": "",
@@ -34,6 +37,7 @@
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
     "@types/node": "^18.0.0",
+    "prisma": "3.15.2",
     "tap": "^16.1.0",
     "ts-node-dev": "^2.0.0"
   }

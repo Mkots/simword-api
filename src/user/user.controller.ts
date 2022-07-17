@@ -2,7 +2,7 @@ import {FastifyReply, FastifyRequest} from "fastify";
 import {createUser, findUserByEmail, findUsers} from "./user.service";
 import {CreateUserSchemaInput, LoginSchemaInput} from "./user.schema";
 import bcrypt from "bcrypt";
-import {server} from "../../app";
+import {server} from "../app";
 
 export async function createUserHandler(request: FastifyRequest<{ Body: CreateUserSchemaInput }>,
                                         reply: FastifyReply) {
